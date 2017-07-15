@@ -162,9 +162,12 @@ function! intero#process#restart() abort
 endfunction
 
 function! intero#process#restart_with_targets(...) abort
-    let l:targets = a:0 == 0 ? s:prompt_for_targets : a:000
-
-    call intero#util#set_load_targets(l:targets)
+    if a:0 == 0
+        let l:targets = s:prompt_for_targets()
+        call intero#targets#set_load_targets(l:targets)
+    else 
+        call intero#util#toggle_targets_on_regex(a:1)
+    endif
     call intero#process#restart()
 endfunction
 
@@ -185,7 +188,7 @@ function! s:text_input() abort
 endfunction
 
 function! s:inputlist_loop() abort
-    let l:stack_targets = intero#util#load_targets_from_stack()
+    let l:stack_targets = intero#targets#load_targets_from_stack()
     let l:current_targets = deepcopy(g:intero_load_targets)
     
     " Construct the target list.
@@ -225,7 +228,7 @@ endfunction
 " currently selected.
 " Type: () -> [{'target': string, 'selected': bool, 'index': int}]
 function! s:create_initial_target_list() abort
-    let l:stack_targets = intero#util#load_targets_from_stack()
+    let l:stack_targets = intero#targets#load_targets_from_stack()
     let l:current_targets = deepcopy(g:intero_load_targets)
     
     let l:target_list = []
