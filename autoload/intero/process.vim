@@ -218,10 +218,7 @@ function! s:inputlist_loop() abort
 
     " Now that the while loop has exited, we need to enable or disable the
     " targets as appropriate.
-    return map(
-        \ filter(l:target_list, {idx, val -> val['selected'] }),
-        \ {idx, val -> val['target']}
-        \ )
+    return map(filter(l:target_list, "v:val['selected']"), "v:val['target']")
 endfunction
 
 " Returns a list of available targets, along with whether or not they're
