@@ -47,6 +47,14 @@ function! intero#targets#set_load_targets(targets) abort
     return g:intero_load_targets
 endfunction
 
+function! intero#targets#clear_load_targets() abort
+    let g:intero_load_targets = []
+endfunction
+
+function! intero#targets#enable_all_targets() abort
+    intero#targets#set_load_targets([])
+endfunction
+
 function! intero#targets#get_load_targets() abort
     return g:intero_load_targets
 endfunction
