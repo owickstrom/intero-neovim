@@ -162,7 +162,15 @@ function! intero#process#restart() abort
 endfunction
 
 function! intero#process#restart_with_targets(...) abort
-    call intero#util#set_load_targets(a:000)
+    if a:0 == 0
+        call inputsave()
+        let l:target_str = input('Targets: ')
+        let l:targets = split(l:target_str, ' ')
+        call inputrestore()
+    else 
+        let l:targets = a:000     
+    endif
+    call intero#util#set_load_targets(l:targets)
     call intero#process#restart()
 endfunction
 
