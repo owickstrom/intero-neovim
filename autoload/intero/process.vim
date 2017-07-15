@@ -1,3 +1,4 @@
+scriptencoding utf-8
 """""""""""
 " Process:
 "
@@ -22,7 +23,7 @@ let s:intero_initialized = 0
 let g:intero_echo_next = 0
 
 " Queue of functions to run when a response is received. For a given response,
-" only the first will be run, after which it will be dropped from the queue.
+" only the first will be run, after  which it will be dropped from the queue.
 let s:response_handlers = []
 
 function! intero#process#initialize() abort
@@ -244,18 +245,18 @@ function! s:create_initial_target_list() abort
 endfunction
 
 " Type: [{'target': string, 'selected': bool, 'index': int}] -> [string]
-function! s:render_target_list(target_list)
+function! s:render_target_list(target_list) abort
     let l:ret = []
-    for target in a:target_list
+    for l:target in a:target_list
         call add(l:ret, s:render_target(l:target))
     endfor
     return l:ret
 endfunction
 
 " Type: {'target': string, 'selected': bool} -> string
-function! s:render_target(target)
+function! s:render_target(target) abort
     let l:selchar = a:target['selected'] ? ' ✔ ' : '   '
-    let l:index = printf("%3d. ", a:target['index'])
+    let l:index = printf('%3d. ', a:target['index'])
     return l:selchar . l:index . a:target['target']
 endfunction
 

@@ -52,7 +52,7 @@ function! intero#targets#clear_load_targets() abort
 endfunction
 
 function! intero#targets#enable_all_targets() abort
-    intero#targets#set_load_targets([])
+    call intero#targets#set_load_targets([])
 endfunction
 
 function! intero#targets#get_load_targets() abort
