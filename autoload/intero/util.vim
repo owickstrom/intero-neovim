@@ -73,6 +73,10 @@ function! intero#util#tocol(line, col) abort "{{{
     return l:len + 1
 endfunction "}}}
 
+function! intero#util#load_targets_from_stack() abort
+    return s:load_targets_from_stack()
+endfunction
+
 function! s:load_targets_from_stack() abort
     return systemlist('stack ide targets')
 endfunction
