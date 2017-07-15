@@ -215,8 +215,14 @@ guess for which to load. You can switch between targets on the fly
                                                            *:InteroSetTargets*
 :InteroSetTargets {target} ..
                   Restarts Intero and starts using the specified targets (can
-                  be more than one). Overwrites whatever was previously in
+                  be more than one). If the target doesn't exist in the output
+                  of stack ide targets, then it is interpreted as a regex and
+                  all matches are toggled. Overwrites whatever was previously in
                   |g:intero_load_targets|.
+
+                  Calling |:InteroSetTargets| without any arguments will
+                  prompt you to select the targets you want to load from a
+                  list.
 
 
 Documentation Pending~
