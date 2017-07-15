@@ -162,11 +162,8 @@ function! intero#process#restart() abort
 endfunction
 
 function! intero#process#restart_with_targets(...) abort
-    if a:0 == 0
-        let l:targets = s:prompt_for_targets()
-    else 
-        let l:targets = a:000     
-    endif
+    let l:targets = a:0 == 0 ? s:prompt_for_targets : a:000
+
     call intero#util#set_load_targets(l:targets)
     call intero#process#restart()
 endfunction
