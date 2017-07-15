@@ -20,7 +20,7 @@ command! -nargs=0 -bang InteroLoadCurrentModule call intero#repl#load_current_mo
 " Loads the current file in Intero.
 command! -nargs=0 -bang InteroLoadCurrentFile call intero#repl#load_current_file()
 " Prompts user for a string to eval
-command! -nargs=0 -bang InteroEval call intero#repl#eval()
+command! -nargs=? -bang InteroEval call intero#repl#eval(<f-args>)
 " Gets the specific type at the current point
 command! -nargs=0 -bang InteroType call intero#repl#type(0)
 " Gets the type at the current point
@@ -43,6 +43,15 @@ command! -nargs=* -bang InteroSetTargets call intero#process#restart_with_target
 command! -nargs=0 -bang InteroClearTargets call intero#targets#clear_load_targets()
 " Set Intero to use all targets given by stack ide targets
 command! -nargs=0 -bang InteroUseAllTargets call intero#targets#enable_all_targets()
+
+" Same as the :InteroType commands, but as maps (so they work with selections)
+noremap <expr> <Plug>InteroType intero#repl#pos_for_type(0)
+noremap <expr> <Plug>InteroGenericType intero#repl#pos_for_type(1)
+
+" Two helper commands needed by the above mappings
+" You should never need to call these manually.
+command! -nargs=* -bang -range InteroTypeAt call intero#repl#type_at(0, <f-args>)
+command! -nargs=* -bang -range InteroGenericTypeAt call intero#repl#type_at(1, <f-args>)
 
 if g:intero_use_neomake
     " Neomake integration
