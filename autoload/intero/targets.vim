@@ -27,18 +27,23 @@ function! intero#targets#set_load_targets(targets) abort
         return g:intero_load_targets
     endif
 
-    let l:valid_targets = []
+    let l:valid_target_dict = {}
     " we are in a stack project, and there are desired targets. validate that
     " they are contained inside the stack load targets
     for l:target in a:targets
         if index(l:stack_targets, l:target) == -1
-            call intero#util#print_warning('Target ' . l:target . ' not present in available Stack targets: ' . join(l:stack_targets, ' '))
+            " Interpret this as a regex and add all matching targets to the
+            " list.
+            let l:matches = filter(copy(l:stack_targets), 'v:val =~ l:target')
+            for l:match in l:matches
+                let l:valid_target_dict[l:match] = 1
+            endfor
         else 
-            call add(l:valid_targets, l:target)
+            let l:valid_target_dict[l:target] = 1
         endif
     endfor
 
-    let g:intero_load_targets = l:valid_targets
+    let g:intero_load_targets = keys(l:valid_target_dict)
     return g:intero_load_targets
 endfunction
 
