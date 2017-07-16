@@ -38,7 +38,7 @@ function! intero#targets#set_load_targets(targets) abort
             for l:match in l:matches
                 let l:valid_target_dict[l:match] = 1
             endfor
-        else 
+        else
             let l:valid_target_dict[l:target] = 1
         endif
     endfor
