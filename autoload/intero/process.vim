@@ -23,7 +23,7 @@ let s:intero_initialized = 0
 let g:intero_echo_next = 0
 
 " Queue of functions to run when a response is received. For a given response,
-" only the first will be run, after  which it will be dropped from the queue.
+" only the first will be run, after which it will be dropped from the queue.
 let s:response_handlers = []
 
 " The name of the buffer that displays Intero compilation progress.
