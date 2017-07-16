@@ -39,8 +39,6 @@ command! -nargs=0 -bang InteroUses call intero#repl#uses() | set hlsearch
 command! -nargs=0 -bang InteroRestart call intero#process#restart()
 " Set the load targets for Intero.
 command! -nargs=* -bang InteroSetTargets call intero#process#restart_with_targets(<f-args>)
-" Reload Intero with all targets disabled.
-command! -nargs=0 -bang InteroClearTargets call intero#targets#clear_load_targets()
 " Set Intero to use all targets given by stack ide targets
 command! -nargs=0 -bang InteroUseAllTargets call intero#targets#enable_all_targets()
 

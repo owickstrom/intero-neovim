@@ -165,7 +165,7 @@ endfunction
 
 function! intero#process#restart_with_targets(...) abort
     if a:0 == 0
-        let l:targets = s:prompt_for_targets()
+        let l:targets = intero#targets#prompt_for_targets()
     else
         let l:targets = a:000
     endif
@@ -176,90 +176,6 @@ endfunction
 """"""""""
 " Private:
 """"""""""
-
-function! s:prompt_for_targets() abort
-    return s:inputlist_loop()
-endfunction
-
-function! s:text_input() abort
-    call inputsave()
-    let l:target_str = input('Targets: ')
-    let l:targets = split(l:target_str, ' ')
-    call inputrestore()
-    return l:targets
-endfunction
-
-function! s:inputlist_loop() abort
-    let l:stack_targets = intero#targets#load_targets_from_stack()
-    let l:current_targets = deepcopy(g:intero_load_targets)
-
-    " Construct the target list.
-    " type is: [{'target': target name, 'selected': bool}]
-    let l:prompt = 'Toggle the target by entering the number and pressing Enter (empty returns the selection)'
-    let l:target_list = s:create_initial_target_list()
-
-    " Render the target list
-    let l:menu = [l:prompt] + s:render_target_list(l:target_list)
-
-    let l:selected = 1
-
-    let l:selected = inputlist(l:menu)
-
-    " l:selected of 0 means that the user didn't select anything, so we
-    " are done here and can return.
-    while l:selected != 0
-        " because the prompt is given in the inputlist, we have to substract one to
-        " the index that was given to select the appropriate index.
-        let l:actual_selected = l:selected - 1
-        let l:is_selected = l:target_list[l:actual_selected]['selected']
-        let l:target_list[l:actual_selected]['selected'] = ! l:is_selected
-
-        let l:menu = [l:prompt] + s:render_target_list(l:target_list)
-        let l:selected = inputlist(l:menu)
-    endwhile
-
-    " Now that the while loop has exited, we need to enable or disable the
-    " targets as appropriate.
-    return map(filter(l:target_list, "v:val['selected']"), "v:val['target']")
-endfunction
-
-" Returns a list of available targets, along with whether or not they're
-" currently selected.
-" Type: () -> [{'target': string, 'selected': bool, 'index': int}]
-function! s:create_initial_target_list() abort
-    let l:stack_targets = intero#targets#load_targets_from_stack()
-    let l:current_targets = deepcopy(g:intero_load_targets)
-
-    let l:target_list = []
-    let l:index = 1
-    for l:target in l:stack_targets
-        let l:selected = index(l:current_targets, l:target) >= 0 ? 1 : 0
-        call add(l:target_list, {
-            \ 'target': l:target,
-            \ 'selected': l:selected,
-            \ 'index': l:index,
-            \ })
-        let l:index += 1
-    endfor
-
-    return l:target_list
-endfunction
-
-" Type: [{'target': string, 'selected': bool, 'index': int}] -> [string]
-function! s:render_target_list(target_list) abort
-    let l:ret = []
-    for l:target in a:target_list
-        call add(l:ret, s:render_target(l:target))
-    endfor
-    return l:ret
-endfunction
-
-" Type: {'target': string, 'selected': bool} -> string
-function! s:render_target(target) abort
-    let l:selchar = a:target['selected'] ? ' ✔ ' : '   '
-    let l:index = printf('%3d. ', a:target['index'])
-    return l:selchar . l:index . a:target['target']
-endfunction
 
 function! s:start_compile(height, opts) abort
     " Starts an Intero compiling in a split below the current buffer.
@@ -286,7 +202,7 @@ function! s:start_buffer(height) abort
     exe 'below ' . a:height . ' split'
 
     enew
-    call termopen('stack '
+    silent call termopen('stack '
         \ . intero#util#stack_opts()
         \ . ' ghci --with-ghc intero '
         \ . intero#util#stack_build_opts(), {
@@ -294,7 +210,7 @@ function! s:start_buffer(height) abort
                 \ 'cwd': pyeval('intero.stack_dirname()')
                 \ })
 
-    file Intero
+    silent file Intero
     set bufhidden=hide
     set noswapfile
     set hidden
