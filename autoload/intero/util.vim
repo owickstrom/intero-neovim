@@ -92,8 +92,9 @@ function! intero#util#strip_control_characters(line) abort
     " https://www.xfree86.org/4.8.0/ctlseqs.html
     let s:regex2 = '[\x1b][>=]'
 
-    let l:result = substitute(a:line, s:regex1, '', 'g')
-    let l:result = substitute(a:line, s:regex2, '', 'g')
+    let l:result = a:line
+    let l:result = substitute(l:result, s:regex1, '', 'g')
+    let l:result = substitute(l:result, s:regex2, '', 'g')
     return l:result
 endfunction
 
