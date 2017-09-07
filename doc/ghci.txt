@@ -1,0 +1,189 @@
+*ghci.txt* Interactive program development for Haskell
+*ghci*
+
+
+ mm   m mmmmmm  mmmm  m    m mmmmm  m    m          mmm  m    m   mmm  mmmmm
+ #"m  # #      m"  "m "m  m"   #    ##  ##        m"   " #    # m"   "   #
+ # #m # #mmmmm #    #  #  #    #    # ## #        #   mm #mmmm# #        #
+ #  # # #      #    #  "mm"    #    # "" #  """   #    # #    # #        #
+ #   ## #mmmmm  #mm#    ##   mm#mm  #    #         "mmm" #    #  "mmm" mm#mm
+
+
+
+=============================================================================
+CONTENTS                                                *ghci-contents*
+
+    1. FEATURES .............................. |ghci-features|
+    2. OVERVIEW .............................. |ghci-overview|
+    3. USAGE ................................. |ghci-usage|
+      3.1 The GHCi Package ................... |ghci-package|
+      3.2 GHCi Background Process ............ |ghci-backend|
+      3.3 The GHCi REPL Buffer ............... |ghci-repl|
+      3.4 Loading Code ....................... |ghci-load|
+    4. CONFIGURATION ......................... |ghci-config|
+    5. CAVEATS ............................... |ghci-caveats|
+    6. LICENSE ............................... |ghci-license|
+    7. CREDITS ............................... |ghci-credits|
+
+=============================================================================
+FEATURES                                                    *ghci-features*
+
+On-the-fly Typechecking~
+
+This plugin reports errors and warnings as you work on your file using the
+Neomake plugin. Errors appear asynchronously, and don't block the UI.
+
+Built-in REPL~
+
+Work with your Haskell code directly in GHCi using Neovim |:terminal| buffers.
+Load your file and play around with top-level functions directly.
+
+=============================================================================
+OVERVIEW                                                    *ghci-overview*
+
+To open the REPL:                                 |:GhciOpen|
+To load into the REPL:                            |:GhciLoadCurrentFile|
+To reload whatever's in the REPL:                 |:GhciReload|
+To evaluate an expression from outside the REPL:  |:GhciEvaluate|
+
+=============================================================================
+USAGE                                                          *ghci-usage*
+
+GHCi Background Process~
+                                                             *ghci-process*
+`neovim-ghci` maintains a GHCi process running in the background. This
+works using Neovim's asynchronous job control API (|job-control|).
+
+By default, the GHCi process is started automatically when you open a Haskell
+buffer. Some people might want to control when (and whether) the background
+process is started. See |g:ghci_start_immediately|.
+
+
+                                                              *:GhciStart*
+                                                              *:GhciKill*
+                                                              *:GhciRestart*
+:GhciStart      Commands for starting and stopping the background
+:GhciKill       process. You shouldn't need |:GhciStart| unless you
+:GhciRestart    have unset |g:ghci_start_immediately|.
+
+                These commands only manipulate the background process.
+                To manipulate the GHCi buffer, see |ghci-buffer|.
+
+
+The GHCi Buffer~
+                                                                *ghci-buffer*
+Normally, GHCi runs in the background. However, you can bring it to the
+foreground into a |:terminal| buffer. There, you can directly interact with
+the REPL.
+
+                                                                 *:GhciOpen*
+                                                                 *:GhciHide*
+:GhciOpen         |:GhciOpen| makes sure that the background process is started
+:GhciHide         (|ghci-process|), then shows the REPL in a split.
+
+                  |:GhciHide| hides the open REPL buffer. It remains running
+                  in the background. To kill the background process, see
+                  |:GhciKill|.
+
+                  By default, the REPL opens in a horizontal split. To instead
+                  use a vertical split use |CTRL-W_H| or |CTRL-W_L|. To move
+                  it to it's own tab: |CTRL-W_T|.
+
+                                                                 *:GhciUses*
+:GhciEval [cmd] Runs a command in the GHCi process, and displays the
+                result. Useful when you don't want to have to open up the
+                full REPL.
+
+                Calling |:GhciEval| will 0 arguments will prompt you to
+                enter a command.
+
+
+Loading Code~
+                                                                *ghci-load*
+It's convenient to be able to load your file's or module's top-level bindings
+into the GHCi REPL so that you can play around. Additionally, some commands
+won't work until you've loaded the current file or module.
+
+                                                               *:GhciReload*
+:GhciReload     Issues a `:reload` to GHCi. This rebuilds your code, and
+                you'll be able to see type checking and compilation errors.
+                If you have Neomake installed, the errors will show up in
+                the sign column and loclist.
+
+                                                      *:GhciLoadCurrentFile*
+:GhciLoadCurrentFile
+                  Gets the current file and loads it into GHCi (using
+                  `:load`).
+
+                                                    *:GhciLoadCurrentModule*
+:GhciLoadCurrentModule
+                  `neovim-ghci` tries to parse the module you're working on
+                  right now, then loads it into GHCi (using `:load`).
+
+Type and Info~
+
+                                                               *:GhciType*
+:GhciType       Issues a `:type` to GHCi, with the identifier under point, or the
+                visual selection, as an argument.
+
+                                                               *:GhciInfo*
+:GhciInfo       Issues an `:info` to GHCi, with the identifier under point as
+                an argument.
+
+=============================================================================
+CONFIGURATION                                                 *ghci-config*
+
+*g:ghci_prompt_regex*
+
+  Default: `'[^-]>'`
+
+  If you use a custom GHCi prompt, you may need to modify the prompt regex so
+  that it matches your custom prompt.
+
+*g:ghci_start_immediately*
+
+  Default: `1`
+
+  GHCi initializes and starts immediately by default. To prevent this from
+  happening manually, set this to `0`.
+
+*g:ghci_use_neomake*
+
+  Default: `1`
+
+  This plugin attempts to use Neomake (|neomake.txt|) if it is installed.  To
+  opt out of using Neomake (including silencing warnings about Neomake), set
+  this to `0`.
+
+*g:ghci_command_line_options*
+
+  Default: ''
+
+  Options that configure the behaviour of GHCi, e.g. `-fobject-code`.
+
+=============================================================================
+CAVEATS                                                    *ghci-caveats*
+
+- Running `:Neomake!` directly will not work. You need to run |:GhciReload|
+  instead.
+
+- Some commands may have unexpected side-effects if you have an autocommand
+  that automatically switches to insert mode when entering a terminal buffer.
+
+=============================================================================
+LICENSE                                                    *ghci-license*
+
+BSD3 License (the same license as `ghcmod-vim`).
+
+=============================================================================
+CREDITS                                                    *ghci-credits*
+
+`neovim-ghci` is adapted, by @owickstrom, from
+https://github.com/parsonsmatt/neovim-intero, which is written by
+@parsonsmatt, with significant contributions from @rdnetto.
+
+`neovim-ghci` welcomes new contributions! Submit pull requests and open
+issues on GitHub: https://github.com/owickstrom/neovim-ghci
+
+
+vim:tw=78:et:ts=2:ft=help:norl:

@@ -1,104 +1,55 @@
-# [Intero][] for Neovim
+<div align="center">
+  <h1>neovim-ghci</h1>
+  <p>Interactive Haskell development using GHCi in Neovim</p>
+</div>
+<hr>
 
-[![Build Status](https://travis-ci.org/parsonsmatt/intero-neovim.svg?branch=master)](https://travis-ci.org/parsonsmatt/intero-neovim)
-
-> A complete interactive development program for Haskell
-
-[Intero][] makes working with Haskell painless by harnessing the power of
-the GHCi REPL. Intero was originally built alongside an Emacs package. This
-plugin ports much of the Emacs plugin functionality into a package for Neovim.
-
-<p align="center">
-  <a href="https://asciinema.org/a/128416">
-    <img
-      width="700px"
-      alt="Intero for Neovim asciicast"
-      src="https://asciinema.org/a/128416.png">
-  </a>
-</p>
-
-- - -
+This is a fork of [intero-neovim][] that uses `cabal new-repl`, instead of
+`intero`. It has fewer features than its Intero counterpart, but does not rely
+on Stack and Intero.
 
 Some key features:
 
-- **Designed for Stack**
-
-  Intero requires Stack. If your project works with Stack, it almost definitely
-  works with Intero.
-
-- **Automatic Setup**
-
-  `intero-neovim` takes care of installing Intero into your Stack environment.
-  The installation is local (not global!). This means that Intero is always
-  current for each of your projects. The goal of Intero is to Just Work™.
-
 - **On-the-fly Typechecking**
 
-  Intero reports errors and warnings as you work on your file using the Neomake
-  plugin. Errors appear asynchronously, and don't block the UI.
+  This plugin reports errors and warnings as you work on your file using the
+  Neomake plugin. Errors appear asynchronously, and don't block the UI.
 
 - **Built-in REPL**
 
   Work with your Haskell code directly in GHCi using Neovim `:terminal` buffers.
   Load your file and play around with top-level functions directly.
 
-- **Type Information**
-
-  You can ask for type information of the identifier under your cursor as well
-  as of a selection. Intero makes an effort to remember type information even
-  when the module no longer typechecks.
-
-- **Jump to Definition**
-
-  After a module has been loaded by Intero, you can jump to the defintion of any
-  identifiers within your package. If the identifier comes from a different
-  package, Intero will tell you which package the identifier comes from.
-
-- **Easy Target Switching**
-
-  Intero makes working with multiple stack targets simple. Jump between your app
-  and test suite seamlessly.
-
-
 ## Installing
 
 This plugin is compatible with `pathogen`, `vim-plug`, etc. For example:
 
 ```viml
-Plug 'parsonsmatt/intero-neovim'
+Plug 'owickstrom/neovim-ghci'
 ```
 
-This plugin requires [Stack][]. Optionally, install [Neomake][] for error
-reporting.
+This plugin requires [Cabal][], 1.24.0 or higher. Optionally, install
+[Neomake][] for error reporting.
 
 
 ## Quickstart
 
-The goal of Intero is to Just Work™. Most of the hard work is done behind the
-scenes. Intero will set itself up automatically when you open a Haskell file.
-
 - To open the REPL:
-  - `:InteroOpen`
+  - `:GhciOpen`
 - To load into the REPL:
-  - `:InteroLoadCurrentFile`
+  - `:GhciLoadCurrentFile`
 - To reload whatever's in the REPL:
-  - `:InteroReload`
-- To get the type of the current identifier or selection:
-  - in your vimrc: `map <silent> <leader>t <Plug>InteroGenericType`
-  - then: press `<leader>t`
-- To jump to a definition:
-  - first `:InteroLoadCurrentFile`
-  - then `:InteroGoToDef`.
-- To switch targets:
-  - `:InteroSetTargets`
-
+  - `:GhciReload`
+- To evaluate an expression from outside the REPL:
+  - `:GhciEvaluate <expression>`, or
+  - `:GhciEvaluate`, and then enter the expression in the prompt.
 
 ## Usage
 
 Complete usage and configuration information can be found in here:
 
 ```vim
-:help intero
+:help ghci
 ```
 
 ## Example Configuration
@@ -107,92 +58,54 @@ These are some suggested settings. This plugin sets up no keybindings by
 default.
 
 ```vim
-augroup interoMaps
+augroup ghciMaps
   au!
-  " Maps for intero. Restrict to Haskell buffers so the bindings don't collide.
+  " Maps for ghci. Restrict to Haskell buffers so the bindings don't collide.
 
   " Background process and window management
-  au FileType haskell nnoremap <silent> <leader>is :InteroStart<CR>
-  au FileType haskell nnoremap <silent> <leader>ik :InteroKill<CR>
+  au FileType haskell nnoremap <silent> <leader>gs :GhciStart<CR>
+  au FileType haskell nnoremap <silent> <leader>gk :GhciKill<CR>
 
-  " Open intero/GHCi split horizontally
-  au FileType haskell nnoremap <silent> <leader>io :InteroOpen<CR>
-  " Open intero/GHCi split vertically
-  au FileType haskell nnoremap <silent> <leader>iov :InteroOpen<CR><C-W>H
-  au FileType haskell nnoremap <silent> <leader>ih :InteroHide<CR>
+  " Open GHCi split horizontally
+  au FileType haskell nnoremap <silent> <leader>go :GhciOpen<CR>
+  " Open GHCi split vertically
+  au FileType haskell nnoremap <silent> <leader>gov :GhciOpen<CR><C-W>H
+  au FileType haskell nnoremap <silent> <leader>gh :GhciHide<CR>
 
-  " Reloading (pick one)
+  " RELOADING (PICK ONE):
+
   " Automatically reload on save
-  au BufWritePost *.hs InteroReload
+  au BufWritePost *.hs GhciReload
   " Manually save and reload
-  au FileType haskell nnoremap <silent> <leader>wr :w \| :InteroReload<CR>
+  au FileType haskell nnoremap <silent> <leader>wr :w \| :GhciReload<CR>
 
   " Load individual modules
-  au FileType haskell nnoremap <silent> <leader>il :InteroLoadCurrentModule<CR>
-  au FileType haskell nnoremap <silent> <leader>if :InteroLoadCurrentFile<CR>
-
-  " Type-related information
-  " Heads up! These next two differ from the rest.
-  au FileType haskell map <silent> <leader>t <Plug>InteroGenericType
-  au FileType haskell map <silent> <leader>T <Plug>InteroType
-  au FileType haskell nnoremap <silent> <leader>it :InteroTypeInsert<CR>
-
-  " Navigation
-  au FileType haskell nnoremap <silent> <leader>jd :InteroGoToDef<CR>
-
-  " Managing targets
-  " Prompts you to enter targets (no silent):
-  au FileType haskell nnoremap <leader>ist :InteroSetTargets<SPACE>
+  au FileType haskell nnoremap <silent> <leader>gl :GhciLoadCurrentModule<CR>
+  au FileType haskell nnoremap <silent> <leader>gf :GhciLoadCurrentFile<CR>
 augroup END
 
-" Intero starts automatically. Set this if you'd like to prevent that.
-let g:intero_start_immediately = 0
+" GHCi starts automatically. Set this if you'd like to prevent that.
+let g:ghci_start_immediately = 0
 ```
 
 ## Caveats
 
-- Running `:Neomake!` directly will not work. You need to run `:InteroReload`
+- Running `:Neomake!` directly will not work. You need to run `:GhciReload`
   instead.
 
 - Some commands may have unexpected side-effects if you have an autocommand
   that automatically switches to insert mode when entering a terminal buffer.
 
-- Completion is not handled by this plugin. You might want to checkout out
-  [neco-ghc][] if you want completion.
-
 ## Contributing
 
-### Python Hacking
-
-Get your environment setup by installing [pipenv] and running:
-
-[pipenv]: http://docs.pipenv.org/en/latest/advanced.html#fancy-installation-of-pipenv
-
-``` bash
-$ pipenv install --dev
-```
-
-Your system level python installation will not be affected.
-
-Then drop into an environment activated shell with:
-
-``` bash
-$ pipenv shell
-```
-
-Then you can run the following:
-
-  * Run the tests with `pytest`
-  * Run the vim linter wiht `vint .`
-  * Run the Python code quality checker with `pylama`
+This project welcomes new contributions! Submit pull requests and open issues
+on GitHub: https://github.com/owickstrom/neovim-ghci
 
 ## License
 
 [BSD3 License](http://www.opensource.org/licenses/BSD-3-Clause), the same
-license as ghcmod-vim.
+license as ghcmod-vim and [intero-neovim][].
 
-
-[Intero]: https://commercialhaskell.github.io/intero/
-[Stack]: https://haskellstack.org/
+[intero-neovim]: https://github.com/parsonsmatt/intero-neovim
+[Cabal]: http://cabal.readthedocs.io/en/latest/
 [Neomake]: https://github.com/neomake/neomake
-[neco-ghc]: https://github.com/eagletmt/neco-ghc

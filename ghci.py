@@ -20,12 +20,6 @@ regexes = [
 ]
 
 
-def stack_dirname():
-    '''Determines the path to the root directory.'''
-
-    return os.path.dirname(vim.eval('g:intero_stack_yaml'))
-
-
 def strip_control_chars(var):
     '''Removes control characters from the specified variable.'''
 
