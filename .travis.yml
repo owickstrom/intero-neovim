@@ -11,6 +11,6 @@ before_script: |
     git clone https://github.com/junegunn/vader.vim.git
 
 script:
-    - vint .
-    - bash -c 'shopt -s globstar; shellcheck **/*.{sh,bash}'
+    - git ls-files | grep '.vim$' | xargs vint
+    - git ls-files | grep '.sh$' | xargs shellcheck
     - ./test/run-tests.sh
