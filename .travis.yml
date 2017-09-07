@@ -1,6 +1,16 @@
 language: python
+
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get install -y shellcheck
+
 install:
     - pip install vim-vint
 
+before_script: |
+    git clone https://github.com/junegunn/vader.vim.git
+
 script:
     - vint .
+    - bash -c 'shopt -s globstar; shellcheck **/*.{sh,bash}'
+    - ./test/run-tests.sh
