@@ -85,7 +85,7 @@ function! intero#util#strip_control_characters(line) abort
     " out the arrow keys as well (xterm codes)
     "
     " https://stackoverflow.com/questions/14693701/
-    let s:regex1 = '\([\x9b]\|[\x1b]\[\)[0-Z]*[ -\/]*[@-~]'
+    let s:regex1 = '\v([\x9b]|[\x1b]\[)[0-Z]*[ -\/]*[@-~]'
 
     " Filter out DECPAM/DECPNM, since they're emitted as well
     "
