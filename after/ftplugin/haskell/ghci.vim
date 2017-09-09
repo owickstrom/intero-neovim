@@ -7,6 +7,10 @@ if !exists('g:ghci_start_immediately')
     let g:ghci_start_immediately = 1
 endif
 
+if !exists('g:ghci_command')
+    let g:ghci_command = 'ghci'
+endif
+
 if g:ghci_start_immediately
     call ghci#process#start()
 endif

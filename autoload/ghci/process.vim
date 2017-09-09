@@ -124,14 +124,13 @@ function! s:start_buffer(height) abort
     " ID of the buffer.
     exe 'below ' . a:height . ' split'
 
-    let l:invocation = 'new-repl'
+    let l:invocation = g:ghci_command
     if exists('g:ghci_command_line_options')
       let l:invocation .= ' ' . g:ghci_command_line_options
     endif
 
     enew
-    silent call termopen('cabal '
-        \ . l:invocation, {
+    silent call termopen(l:invocation, {
                 \ 'on_stdout': function('s:on_stdout'),
                 \ 'cwd': '.'
                 \ })

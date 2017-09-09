@@ -4,7 +4,7 @@
 </div>
 <hr>
 
-This is a fork of [intero-neovim][] that uses `cabal new-repl`, instead of
+This is a fork of [intero-neovim][] that uses regular GHCi, instead of
 `intero`. It has fewer features than its Intero counterpart, but does not rely
 on Stack and Intero.
 

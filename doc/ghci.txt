@@ -155,6 +155,13 @@ CONFIGURATION                                                 *ghci-config*
   opt out of using Neomake (including silencing warnings about Neomake), set
   this to `0`.
 
+*g:ghci_command*
+
+  Default: 'ghci'
+
+  How to start the GHCi process. Other values can be `cabal repl`, or `cabal
+  new-repl`.
+
 *g:ghci_command_line_options*
 
   Default: ''
