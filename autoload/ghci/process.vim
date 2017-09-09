@@ -33,19 +33,14 @@ function! ghci#process#initialize() abort
         return
     endif
 
-    if(!exists('g:ghci_built'))
-
-        if g:ghci_use_neomake && !exists(':Neomake')
-            echom 'Neomake not detected. Flychecking will be disabled.'
-        endif
-
-        " Load Python code
-        py import sys
-        call pyeval('sys.path.append("' . g:ghci_plugin_root . '")')
-        py import ghci
-
-        let g:ghci_built = 1
+    if g:ghci_use_neomake && !exists(':Neomake')
+        echom 'Neomake not detected. Flychecking will be disabled.'
     endif
+
+    " Load Python code
+    py import sys
+    call pyeval('sys.path.append("' . g:ghci_plugin_root . '")')
+    py import ghci
 
     let s:ghci_initialized = 1
 endfunction
@@ -56,11 +51,6 @@ function! ghci#process#start() abort
     " Returns the ghci buffer id.
 
     call ghci#process#initialize()
-
-    if(!exists('g:ghci_built') || g:ghci_built == 0)
-        echom 'GHCi is still compiling'
-        return -1
-    endif
 
     if !exists('g:ghci_buffer_id')
         let g:ghci_buffer_id = s:start_buffer(10)
