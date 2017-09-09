@@ -86,6 +86,10 @@ augroup END
 
 " GHCi starts automatically. Set this if you'd like to prevent that.
 let g:ghci_start_immediately = 0
+
+" Customize how to run GHCi
+let g:ghci_command = 'cabal new-repl'
+let g:ghci_command_line_options = '-fobject-code'
 ```
 
 ## Caveats
