@@ -8,7 +8,7 @@ let s:starting_up_msg = 'GHCi is still starting up...'
 
 function! ghci#repl#eval(...) abort
     if !g:ghci_started
-        echoerr starting_up_msg
+        echoerr s:starting_up_msg
     else
         " Given no arguments, this requests an expression from the user and
         " evaluates it in the GHCi REPL.
@@ -30,7 +30,7 @@ endfunction
 
 function! ghci#repl#load_current_module() abort
     if !g:ghci_started
-        echoerr starting_up_msg
+        echoerr s:starting_up_msg
     else
         " Loads the current module, inferred from the given filename.
         call ghci#repl#send(':l ' . ghci#loc#detect_module())
@@ -39,7 +39,7 @@ endfunction
 
 function! ghci#repl#load_current_file() abort
     if !g:ghci_started
-        echoerr starting_up_msg
+        echoerr s:starting_up_msg
     else
         " Load the current file
         call ghci#repl#send(':l ' . expand('%:p'))
@@ -59,7 +59,7 @@ endfunction
 
 function! ghci#repl#info() abort
     if !g:ghci_started
-        echoerr starting_up_msg
+        echoerr s:starting_up_msg
     else
         let l:ident = ghci#util#get_haskell_identifier()
         call ghci#repl#eval(':info ' . l:ident)
@@ -77,7 +77,7 @@ endfunction
 
 function! ghci#repl#reload() abort
     if !g:ghci_started
-        echoerr starting_up_msg
+        echoerr s:starting_up_msg
     else
         " Truncate file, so that we don't show stale results while recompiling
         call ghci#maker#write_update([])
