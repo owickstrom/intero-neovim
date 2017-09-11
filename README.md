@@ -92,6 +92,24 @@ let g:ghci_command = 'cabal new-repl'
 let g:ghci_command_line_options = '-fobject-code'
 ```
 
+### Using the Stack REPL
+
+If you'd like to use `stack repl`, instead of plain `ghci` or `cabal repl`, you
+can use something like the following configuration:
+
+``` vim
+let g:ghci_command = 'stack repl'
+let g:ghci_command_line_options = '--ghci-options="-fobject-code"'
+```
+
+Using a [project specific
+.vim.rc](https://andrew.stwrt.ca/posts/project-specific-vimrc/), you can also
+customize the Stack targets for the GHCi session of particular projects:
+
+``` vim
+let g:ghci_command = 'stack repl my-project:test:my-test-suite'
+```
+
 ## Caveats
 
 - Running `:Neomake!` directly will not work. You need to run `:GhciReload`
