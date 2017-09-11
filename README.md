@@ -103,7 +103,7 @@ let g:ghci_command_line_options = '--ghci-options="-fobject-code"'
 ```
 
 Using a [project specific
-.vim.rc](https://andrew.stwrt.ca/posts/project-specific-vimrc/), you can also
+.nvim.rc](https://andrew.stwrt.ca/posts/project-specific-vimrc/), you can also
 customize the Stack targets for the GHCi session of particular projects:
 
 ``` vim
