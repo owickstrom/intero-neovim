@@ -32,18 +32,25 @@ command! -nargs=0 -bang GhciRestart call ghci#process#restart()
 
 if g:ghci_use_neomake
     " Neomake integration
+
+    " Try GHC 8 errors and warnings, then GHC 7 errors and warnings, and regard
+    " lines starting with two spaces as continuations on an error message. All
+    " other lines are disregarded. This gives a clean one-line-per-entry in the
+    " QuickFix list.
+    let s:efm = '%E%f:%l:%c:\ error:%#,' .
+                \ '%W%f:%l:%c:\ warning:%#,' .
+                \ '%f:%l:%c:\ %trror: %m,' .
+                \ '%f:%l:%c:\ %tarning: %m,' .
+                \ '%E%f:%l:%c:%#,' .
+                \ '%E%f:%l:%c:%m,' .
+                \ '%W%f:%l:%c:\ Warning:%#,' .
+                \ '%C\ \ %m%#,' .
+                \ '%-G%.%#'
+
     let g:neomake_ghci_maker = {
             \ 'exe': 'cat',
             \ 'args': [ghci#maker#get_log_file()],
-            \ 'errorformat':
-                \ '%-G%\s%#,' .
-                \ '%f:%l:%c:%trror: %m,' .
-                \ '%f:%l:%c:%tarning: %m,'.
-                \ '%f:%l:%c: %trror: %m,' .
-                \ '%f:%l:%c: %tarning: %m,' .
-                \ '%E%f:%l:%c:%m,' .
-                \ '%E%f:%l:%c:,' .
-                \ '%Z%m'
+            \ 'errorformat': s:efm
         \ }
 endif
 
