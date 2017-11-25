@@ -20,6 +20,10 @@ Some key features:
   Work with your Haskell code directly in GHCi using Neovim `:terminal` buffers.
   Load your file and play around with top-level functions directly.
 
+## Demo
+
+[![asciicast](https://asciinema.org/a/q9I5eNblDLCoOiQlZjm1ce0ba.png)](https://asciinema.org/a/q9I5eNblDLCoOiQlZjm1ce0ba?size=20&speed=3&theme=tango)
+
 ## Installing
 
 This plugin is compatible with `pathogen`, `vim-plug`, etc. For example:
@@ -65,6 +69,9 @@ augroup ghciMaps
   " Background process and window management
   au FileType haskell nnoremap <silent> <leader>gs :GhciStart<CR>
   au FileType haskell nnoremap <silent> <leader>gk :GhciKill<CR>
+
+  " Restarting GHCi might be required if you add new dependencies
+  au FileType haskell nnoremap <silent> <leader>gr :GhciRestart<CR>
 
   " Open GHCi split horizontally
   au FileType haskell nnoremap <silent> <leader>go :GhciOpen<CR>
