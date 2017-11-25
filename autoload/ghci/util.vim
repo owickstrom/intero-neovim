@@ -11,11 +11,6 @@ function! ghci#util#get_ghci_window() abort
     return bufwinnr('GHCi')
 endfunction
 
-function! ghci#util#make_command(cmd) abort
-    let l:info = ghci#loc#get_identifier_information()
-    return join([a:cmd, l:info.module, l:info.line, l:info.beg_col, l:info.line, l:info.end_col, l:info.identifier], ' ')
-endfunction
-
 """"""""""
 " The following functions were copied from ghcmod-vim.
 """"""""""

@@ -23,7 +23,8 @@ Some key features:
 - **Type Information**
 
   You can ask for type information of the identifier under your cursor as well
-  as of a selection.
+  as of a selection. You can also have it insert type signatures automatically,
+  based on inferred types.
 
 ## Demo
 

@@ -6,6 +6,10 @@
 
 let s:starting_up_msg = 'GHCi is still starting up...'
 
+" The indent level (number of spaces) of the identifier to insert a type for.
+" It's inserted in a callback, hence this state variable.
+let s:insert_type_indent = 0
+
 function! ghci#repl#eval(...) abort
     if !g:ghci_started
         echoerr s:starting_up_msg
@@ -73,13 +77,16 @@ function! s:type_at(l1, c1, l2, c2) abort
         \ join([':type-at', '"' . l:module . '"', a:l1, l:col1, a:l2, l:col2 + 1, l:identifier], ' '))
 endfunction
 
+function! s:supports_type_at() abort
+    let [l:major, l:minor, l:patch] = g:ghci_version
+    " >= 8.0.1 supports :type-at
+    return l:major >= 8 && ((l:minor == 0 && l:patch >= 1) || l:minor > 0)
+endfunction
+
 " The entry point for getting type information, checking what the GHCi REPL
 " supports.
 function! ghci#repl#type(l1, c1, l2, c2) abort
-    let [l:major, l:minor, l:patch] = g:ghci_version
-
-    " >= 8.0.1 supports :type-at
-    if l:major >= 8 && ((l:minor == 0 && l:patch >= 1) || l:minor > 0)
+    if s:supports_type_at()
         call s:type_at(a:l1, a:c1, a:l2, a:c2)
     else
         call s:type(a:l1, a:c1, a:l2, a:c2)
@@ -108,6 +115,27 @@ function! ghci#repl#info() abort
     endif
 endfunction
 
+function! ghci#repl#insert_type() abort
+    if !g:ghci_started
+        echoerr 'GHCi is still starting up.'
+    else
+        let [l:identifier, l:c1, l:c2] = ghci#util#get_haskell_identifier_and_pos()
+        " for callback to add correct indent:
+        let s:insert_type_indent = l:c1
+
+        if s:supports_type_at()
+            let l:l = line('.')
+            let l:module = @%
+            let l:cmd = join([':type-at', '"' . l:module . '"', l:l, l:c1, l:l, l:c2 + 1, l:identifier], ' ')
+        else
+            let l:cmd = join([':type', l:identifier], ' ')
+        endif
+
+        call ghci#process#add_handler(function('s:paste_type'))
+        call ghci#repl#send(l:cmd)
+    endif
+endfunction
+
 function! ghci#repl#send(str) abort
     " Sends a:str to the GHCi REPL.
     if !exists('g:ghci_buffer_id')
@@ -133,9 +161,29 @@ endfunction
 """"""""""
 
 function! s:paste_type(lines) abort
+    let l:indent = repeat(' ', s:insert_type_indent)
+
+    let l:first = a:lines[0]
+    " We indent all but the first line.
+    let l:indented = []
+    for l:line in a:lines[1:]
+        call add(l:indented, l:indent . l:line)
+    endfor
+
+    let l:old = getline('.')
+
+    if s:insert_type_indent > 0
+        let l:prefix = l:old[0:(s:insert_type_indent - 1)]
+        let l:suffix = l:old[(s:insert_type_indent):]
+    else
+        let l:prefix = ''
+        let l:suffix = l:old
+    endif
+
     let l:message = join(a:lines, '\n')
     if l:message =~# ' :: '
-        call append(line('.')-1, a:lines)
+        call setline(line ('.'), l:prefix . l:first)
+        call append(line ('.'), l:indented + [l:indent . l:suffix])
     else
         echomsg l:message
     end

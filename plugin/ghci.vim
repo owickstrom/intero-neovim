@@ -27,6 +27,8 @@ command! -nargs=* -bang -range GhciTypeAt call ghci#repl#type(<f-args>)
 
 " Gets info for the identifier at the current point
 command! -nargs=0 -bang GhciInfo call ghci#repl#info()
+" Inserts type signature for identifier at the current point
+command! -nargs=0 -bang GhciTypeInsert call ghci#repl#insert_type()
 " Reload
 command! -nargs=0 -bang GhciReload call ghci#repl#reload()
 " Kill and restart the GHCi process
