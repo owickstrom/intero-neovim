@@ -39,6 +39,7 @@ if g:ghci_use_neomake
     " QuickFix list.
     let s:efm = '%E%f:%l:%c:\ error:%#,' .
                 \ '%W%f:%l:%c:\ warning:%#,' .
+                \ '%W%f:%l:%c:\ warning:\ [-W%.%#]%#,' .
                 \ '%f:%l:%c:\ %trror: %m,' .
                 \ '%f:%l:%c:\ %tarning: %m,' .
                 \ '%E%f:%l:%c:%#,' .
