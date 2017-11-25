@@ -123,8 +123,8 @@ won't work until you've loaded the current file or module.
 Type and Info~
 
                                                                *:GhciType*
-:GhciType       Issues a `:type` to GHCi, with the identifier under point, or the
-                visual selection, as an argument.
+:GhciType       Issues a `:type` or `:type-at` to GHCi, with the identifier under
+                point, or the visual selection, as an argument.
 
                                                                *:GhciInfo*
 :GhciInfo       Issues an `:info` to GHCi, with the identifier under point as

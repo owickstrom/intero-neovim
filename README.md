@@ -20,6 +20,11 @@ Some key features:
   Work with your Haskell code directly in GHCi using Neovim `:terminal` buffers.
   Load your file and play around with top-level functions directly.
 
+- **Type Information**
+
+  You can ask for type information of the identifier under your cursor as well
+  as of a selection.
+
 ## Demo
 
 [![asciicast](https://asciinema.org/a/q9I5eNblDLCoOiQlZjm1ce0ba.png)](https://asciinema.org/a/q9I5eNblDLCoOiQlZjm1ce0ba?size=20&speed=3&theme=tango)
@@ -79,6 +84,9 @@ augroup ghciMaps
   au FileType haskell nnoremap <silent> <leader>gov :GhciOpen<CR><C-W>H
   au FileType haskell nnoremap <silent> <leader>gh :GhciHide<CR>
 
+  " Getting type information
+  au FileType haskell map <silent> <leader>gt <Plug>GhciType
+
   " RELOADING (PICK ONE):
 
   " Automatically reload on save
@@ -96,7 +104,7 @@ let g:ghci_start_immediately = 0
 
 " Customize how to run GHCi
 let g:ghci_command = 'cabal new-repl'
-let g:ghci_command_line_options = '-fobject-code'
+let g:ghci_command_line_options = ''
 ```
 
 ### Using the Stack REPL

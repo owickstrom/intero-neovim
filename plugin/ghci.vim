@@ -21,8 +21,10 @@ command! -nargs=0 -bang GhciLoadCurrentModule call ghci#repl#load_current_module
 command! -nargs=0 -bang GhciLoadCurrentFile call ghci#repl#load_current_file()
 " Prompts user for a string to eval
 command! -nargs=? -bang GhciEval call ghci#repl#eval(<f-args>)
-" Gets the type at the current point or in visual selection
-command! -nargs=0 -bang -range GhciType call ghci#repl#type(visualmode())
+
+noremap <expr> <Plug>GhciType ghci#repl#pos_for_type()
+command! -nargs=* -bang -range GhciTypeAt call ghci#repl#type(<f-args>)
+
 " Gets info for the identifier at the current point
 command! -nargs=0 -bang GhciInfo call ghci#repl#info()
 " Reload

@@ -18,6 +18,10 @@ let g:ghci_started = 0
 " Whether GHCi has done its initialization yet
 let s:ghci_initialized = 0
 
+let s:no_version = [0, 0, 0]
+" The version of GHCi, parsed on startup.
+let g:ghci_version = s:no_version
+
 " If true, echo the next response. Reset after each response.
 let g:ghci_echo_next = 0
 
@@ -73,6 +77,7 @@ function! ghci#process#kill() abort
         " Deleting a terminal buffer implicitly stops the job
         unlet g:ghci_job_id
         let g:ghci_started = 0
+        let g:ghci_version = s:no_version
     endif
 endfunction
 
@@ -169,10 +174,18 @@ function! s:on_stdout(jobid, lines, event) abort
         " Note that we need to strip control chars here, because otherwise
         " they're only removed when the line is added to the response.
         if pyeval('ghci.strip_control_chars("s:current_line")') =~ (g:ghci_prompt_regex . '$')
+
             if len(s:current_response) > 0
-                " Separate the input command from the response
-                let l:cmd = substitute(s:current_response[0], '.*' . g:ghci_prompt_regex, '', '')
-                call s:new_response(l:cmd, s:current_response[1:])
+                " This means that GHCi is now available to run commands
+                if !g:ghci_started
+                    echom 'GHCi ready'
+                    let g:ghci_started = 1
+                    call s:on_initial_compile(s:current_response)
+                else
+                    " Separate the input command from the response
+                    let l:cmd = substitute(s:current_response[0], '.*' . g:ghci_prompt_regex, '', '')
+                    call s:new_response(l:cmd, s:current_response[1:])
+                endif
             endif
 
             let s:current_response = []
@@ -181,16 +194,26 @@ function! s:on_stdout(jobid, lines, event) abort
     endfor
 endfunction
 
-function! s:new_response(cmd, response) abort
-    let l:initial_compile = 0
+function! s:parse_ghci_version(output) abort
+    for l in a:output
+        call system('echo '.l.' > /tmp/out.log')
+        let matches = matchlist(l, 'GHCi, version \(\d*\)\.\(\d*\).\(\d*\):')
+        if !empty(matches)
+            let g:ghci_version = [matches[1] + 0, matches[2] + 0, matches[3] + 0]
+        endif
+    endfor
+endfunction
 
-    " This means that GHCi is now available to run commands
-    if !g:ghci_started
-        echom 'GHCi ready'
-        let g:ghci_started = 1
-        let l:initial_compile = 1
+function! s:on_initial_compile(output) abort
+    if g:ghci_version == [0, 0, 0]
+        call s:parse_ghci_version(a:output)
     endif
 
+    " Trigger Neomake's parsing of the compilation errors
+    call ghci#maker#write_update(a:output)
+endfunction
+
+function! s:new_response(cmd, response) abort
     " For debugging
     let g:ghci_response = a:response
 
@@ -200,7 +223,7 @@ function! s:new_response(cmd, response) abort
         let g:ghci_echo_next = 0
     endif
 
-    if(l:initial_compile || a:cmd =~# ':reload')
+    if(a:cmd =~# ':reload')
         " Trigger Neomake's parsing of the compilation errors
         call ghci#maker#write_update(a:response)
     endif

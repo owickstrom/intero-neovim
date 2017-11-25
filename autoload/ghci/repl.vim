@@ -46,15 +46,57 @@ function! ghci#repl#load_current_file() abort
     endif
 endfunction
 
-" the `visual` argument should be either '' or 'V'
-function! ghci#repl#type(visual) abort
-    if (a:visual == 'V')
+" Called only if the version of GHCi doesn't support :type-at.
+function! s:type(l1, c1, l2, c2) abort
+    if !(a:l1 == a:l2 && a:c1 == a:c2)
         let l:expr = ghci#util#get_visual_selection()
     else
         let l:expr = ghci#util#get_haskell_identifier()
     endif
 
     call ghci#repl#eval(':type ' . l:expr)
+endfunction
+
+" Called only if the version of GHCi supports :type-at.
+function! s:type_at(l1, c1, l2, c2) abort
+    let l:module = @%
+
+    if !(a:l1 == a:l2 && a:c1 == a:c2)
+        let l:identifier = ghci#util#get_selection(a:l1, a:c1, a:l2, a:c2)
+        let l:col1 = a:c1
+        let l:col2 = a:c2
+    else
+        let [l:identifier, l:col1, l:col2] = ghci#util#get_haskell_identifier_and_pos()
+    endif
+
+    call ghci#repl#eval(
+        \ join([':type-at', '"' . l:module . '"', a:l1, l:col1, a:l2, l:col2 + 1, l:identifier], ' '))
+endfunction
+
+" The entry point for getting type information, checking what the GHCi REPL
+" supports.
+function! ghci#repl#type(l1, c1, l2, c2) abort
+    let [l:major, l:minor, l:patch] = g:ghci_version
+
+    " >= 8.0.1 supports :type-at
+    if l:major >= 8 && ((l:minor == 0 && l:patch >= 1) || l:minor > 0)
+        call s:type_at(a:l1, a:c1, a:l2, a:c2)
+    else
+        call s:type(a:l1, a:c1, a:l2, a:c2)
+    endif
+endfunction
+
+" This function gets the type of what's under the cursor OR under a selection.
+" It MUST be run from a key mapping (commands exit you out of visual mode).
+function! ghci#repl#pos_for_type() abort
+    " 'v' gets the start of the selection (or cursor pos if no selection)
+    let [l:l1, l:c1] = getpos('v')[1:2]
+    " " '.' gets the cursor pos (or the end of the selection if selection)
+    let [l:l2, l:c2] = getpos('.')[1:2]
+
+    " Meant to be used from an expr map (:help :map-<expr>).
+    " That means we have to return the next command as a string.
+    return ':GhciTypeAt '.l:l1.' '.l:c1.' '.l:l2.' '.l:c2."\<CR>"
 endfunction
 
 function! ghci#repl#info() abort
@@ -98,4 +140,3 @@ function! s:paste_type(lines) abort
         echomsg l:message
     end
 endfunction
-
