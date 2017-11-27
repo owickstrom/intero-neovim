@@ -61,9 +61,17 @@ function! s:type(l1, c1, l2, c2) abort
     call ghci#repl#eval(':type ' . l:expr)
 endfunction
 
+function! s:get_module_filepath() abort
+    if g:ghci_command =~# "^stack"
+        return expand('%:p')
+    else
+        return @%
+    endif
+endfunction
+
 " Called only if the version of GHCi supports :type-at.
 function! s:type_at(l1, c1, l2, c2) abort
-    let l:module = @%
+    let l:module = s:get_module_filepath()
 
     if !(a:l1 == a:l2 && a:c1 == a:c2)
         let l:identifier = ghci#util#get_selection(a:l1, a:c1, a:l2, a:c2)
@@ -125,7 +133,7 @@ function! ghci#repl#insert_type() abort
 
         if s:supports_type_at()
             let l:l = line('.')
-            let l:module = @%
+            let l:module = s:get_module_filepath()
             let l:cmd = join([':type-at', '"' . l:module . '"', l:l, l:c1, l:l, l:c2 + 1, l:identifier], ' ')
         else
             let l:cmd = join([':type', l:identifier], ' ')
