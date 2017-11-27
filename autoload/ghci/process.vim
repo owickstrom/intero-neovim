@@ -196,7 +196,6 @@ endfunction
 
 function! s:parse_ghci_version(output) abort
     for l in a:output
-        call system('echo '.l.' > /tmp/out.log')
         let matches = matchlist(l, 'GHCi, version \(\d*\)\.\(\d*\).\(\d*\):')
         if !empty(matches)
             let g:ghci_version = [matches[1] + 0, matches[2] + 0, matches[3] + 0]
