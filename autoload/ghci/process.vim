@@ -222,7 +222,7 @@ function! s:new_response(cmd, response) abort
         let g:ghci_echo_next = 0
     endif
 
-    if(a:cmd =~# ':reload')
+    if a:cmd =~# ':reload'
         " Trigger Neomake's parsing of the compilation errors
         call ghci#maker#write_update(a:response)
     endif
