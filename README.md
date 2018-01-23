@@ -1,3 +1,13 @@
+# DEPRECATED
+
+**THIS FORK HAS BEEN INTEGRATED BACK INTO [ITS UPSTREAM](https://github.com/parsonsmatt/intero-neovim) AND IS NO LONGER MAINTAINED!**
+
+If you are using this plugin since before the deprecation, it's recommended you switch over to https://github.com/parsonsmatt/intero-neovim. [It now has support for using any GHCi as a backend](https://github.com/parsonsmatt/intero-neovim#using-a-custom-backend), the primary feature of this plugin when it was forked. Thanks for your usage and support!
+
+<hr>
+<hr>
+<hr>
+
 <div align="center">
   <h1>neovim-ghci</h1>
   <p>Interactive Haskell development using GHCi in Neovim</p>
