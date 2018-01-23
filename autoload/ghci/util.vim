@@ -11,17 +11,12 @@ function! ghci#util#get_ghci_window() abort
     return bufwinnr('GHCi')
 endfunction
 
-function! ghci#util#make_command(cmd) abort
-    let l:info = ghci#loc#get_identifier_information()
-    return join([a:cmd, l:info.module, l:info.line, l:info.beg_col, l:info.line, l:info.end_col, l:info.identifier], ' ')
-endfunction
-
 """"""""""
 " The following functions were copied from ghcmod-vim.
 """"""""""
 "
 " Return the current haskell identifier
-function! ghci#util#get_haskell_identifier() abort
+function! ghci#util#get_haskell_identifier_and_pos() abort
     let l:c = col ('.') - 1
     let l:l = line('.')
     let l:ll = getline(l:l)
@@ -29,7 +24,16 @@ function! ghci#util#get_haskell_identifier() abort
     let l:ll1 = matchstr(l:ll1, "[a-zA-Z0-9_'.]*$")
     let l:ll2 = strpart(l:ll, l:c, strlen(l:ll) - l:c + 1)
     let l:ll2 = matchstr(l:ll2, "^[a-zA-Z0-9_'.]*")
-    return l:ll1 . l:ll2
+    return [l:ll1 . l:ll2, l:c - strlen(l:ll1), l:c + strlen(l:ll2)]
+endfunction "}}}
+"
+""""""""""
+" The following functions were copied from ghcmod-vim.
+""""""""""
+"
+" Return the current haskell identifier
+function! ghci#util#get_haskell_identifier() abort
+    return ghci#util#get_haskell_identifier_and_pos()[0]
 endfunction "}}}
 
 function! ghci#util#print_warning(msg) abort "{{{
@@ -68,14 +72,18 @@ function! ghci#util#get_visual_selection() abort
     " Why is this not a built-in Vim script function?!
     let [line_start, column_start] = getpos("'<")[1:2]
     let [line_end, column_end] = getpos("'>")[1:2]
-    let lines = getline(line_start, line_end)
+    return ghci#util#get_selection(line_start, column_start, line_end, column_end)
+endfunction
+
+function! ghci#util#get_selection(l1, c1, l2, c2) abort
+    " Why is this not a built-in Vim script function?!
+    let lines = getline(a:l1, a:l2)
     if len(lines) == 0
         return ''
     endif
-    let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
-    let lines[0] = lines[0][column_start - 1:]
+    let lines[-1] = lines[-1][: a:c2 - (&selection == 'inclusive' ? 1 : 2)]
+    let lines[0] = lines[0][a:c1 - 1:]
     return join(lines, "\n")
 endfunction
-
 
 " vim: set ts=4 sw=4 et fdm=marker:
